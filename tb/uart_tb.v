@@ -11,8 +11,6 @@ module uart_tb;
     wire rx_done;
     wire tx;
     wire tx_busy;
-
-    // Instantiate DUT
     uart_top uut (
         .clk(clk),
         .rst(rst),
@@ -23,48 +21,28 @@ module uart_tb;
         .tx(tx),
         .tx_busy(tx_busy)
     );
-
-    // 50 MHz Clock (20 ns period)
     initial begin
         clk = 0;
         forever #10 clk = ~clk;
     end
 
-    // Test sequence
     initial begin
-        // Reset
         rst      = 1;
         tx_start = 0;
         tx_data  = 8'h00;
 
-        #200;    // hold reset
+        #200;    
         rst = 0;
-
-        // -------------------------------
-        // TEST CASE 1
-        // -------------------------------
         send_byte(8'b10110111);
         wait(rx_done);
         $display("TC1 Sent     = %b", 8'b10110111);
         $display("TC1 Received = %b", rx_data);
-
-        // Gap before next test
         #2000000; // 2 ms
-
-        // -------------------------------
-        // TEST CASE 2
-        // -------------------------------
         send_byte(8'b00000000);
         wait(rx_done);
         $display("TC2 Sent     = %b", 8'b00000000);
         $display("TC2 Received = %b", rx_data);
-
-        // Gap before next test
         #2000000; // 2 ms
-
-        // -------------------------------
-        // TEST CASE 3
-        // -------------------------------
         send_byte(8'b11111111);
         wait(rx_done);
         $display("TC3 Sent     = %b", 8'b11111111);
@@ -74,10 +52,6 @@ module uart_tb;
         #1000000;
         $finish;
     end
-
-    // -------------------------------
-    // Task to send a byte
-    // -------------------------------
     task send_byte(input [7:0] data);
     begin
         tx_data  = data;
